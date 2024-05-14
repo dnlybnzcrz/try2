@@ -1,0 +1,50 @@
+name: Automerge Changes to app.py
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config user.name "Your Name"
+        git config user.email "youremail@example.com"
+
+    - name: Install project dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Check Syntax
+      run: |
+        pip install pylint
+        pylint app.py
+      continue-on-error: true
+
+    - name: Merge Pull Requests and Add Status
+      run: |
+        PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls?state=open" | jq length)
+        if [ $PR_COUNT -gt 0 ]; then
+          for ((i = 1; i <= $PR_COUNT; i++)); do
+            git fetch origin pull/$i/head:pr/$i
+            git checkout pr/$i
+            collaborator_name=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$i" | jq -r .user.login)
+            git merge main --no-edit -m "Merge #${i} from ${collaborator_name}"
+            git push origin pr/$i
+            # Use GitHub API to create a status check
+            GITHUB_SHA=$(git rev-parse HEAD)
+            status_context="Automerge Status"
+            status_description="Automerge successful"
+            status_state="success"
+            curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/statuses/${GITHUB_SHA}" -d "{\"state\":\"${status_state}\",\"target_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"description\":\"${status_description}\",\"context\":\"${status_context}\"}"
+          done
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
