@@ -31,11 +31,11 @@ st.info("Rain and Shine")
 file = st.file_uploader("Choose a photo from your computer", type=["jpg", "png"])
 
 def import_and_predict(image_data, model):
-    size = (224, 224)
+    size = (224, 224)  # Ensure this matches your model input size
     image = ImageOps.fit(image_data, size, Image.LANCZOS)
     img = np.asarray(image)
     img = img / 255.0  # Normalize the image
-    img = img[np.newaxis, ...]  # Add batch dimension
+    img = np.expand_dims(img, axis=0)  # Add batch dimension
     prediction = model.predict(img)
     return prediction
 
@@ -49,7 +49,7 @@ else:
         st.image(image, use_column_width=True)
         # Process the image and get predictions
         prediction = import_and_predict(image, model)
-        class_names = ['Shine', 'Rain']
+        class_names = ['Shine', 'Rain']  # Adjust to your actual class names
         max_prob = np.max(prediction)
         prediction_label = class_names[np.argmax(prediction)]
         # Show the prediction and confidence score
