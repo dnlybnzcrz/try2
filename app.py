@@ -23,7 +23,6 @@ st.markdown("1. Upload an image using the 'Browse Files' button.")
 st.markdown("2. Wait for the model to process the image.")
 st.markdown("3. View the prediction and confidence score.")
 image = Image.open('Weather_girl.jpg')
-st.image(image, caption='Weather Classification Model - John Willard S. Sucgang')
 
 st.header("Model Outputs")
 st.info("Rain and Shine")
@@ -66,7 +65,6 @@ else:
         sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
         st.pyplot(plt)
 
-st.info("Github Link: https://github.com/Willythepo0h/Emerging-Tech-2")
 
 st.header("User Comments and Feedback")
 st.write("Please leave your comments and feedback about the Weather Classification Model.")
