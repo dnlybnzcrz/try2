@@ -57,8 +57,8 @@ else:
         st.write(f"Confidence Score: {max_prob:.2%}")
 
         # For demonstration, we'll create a mock confusion matrix
-        true_labels = class_names
-        predicted_labels = [prediction_label if label == prediction_label else "Other" for label in class_names]
+        true_labels = ['Shine', 'Rain', 'Shine', 'Rain']  # Mock true labels
+        predicted_labels = [prediction_label, prediction_label, 'Shine', 'Rain']  # Mock predictions
         
         cm = confusion_matrix(true_labels, predicted_labels, labels=class_names)
         st.write("Confusion Matrix")
